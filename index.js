@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import { browserAgent, vuePersistentStore } from '@knowlearning/agents'
 import mainComponent from './index.vue'
 import storeConfig from './store.js'
+import './index.css'
 
 window.Agent = browserAgent()
 
