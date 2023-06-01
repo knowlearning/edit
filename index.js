@@ -6,7 +6,11 @@ import storeConfig from './store.js'
 
 window.Agent = browserAgent()
 
-const store = createStore(await vuePersistentStore(storeConfig))
-const app = createApp(mainComponent)
-app.use(store)
-app.mount(document.body)
+async function initialize() {
+  const store = createStore(await vuePersistentStore(storeConfig))
+  const app = createApp(mainComponent)
+  app.use(store)
+  app.mount(document.body)
+}
+
+initialize()
