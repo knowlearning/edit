@@ -1,5 +1,5 @@
 import { v1 as uuid } from "uuid"
-import { Decoration, WidgetType, ViewPlugin, EditorView } from "npm/codemirror/view/6.9.2"
+import { Decoration, WidgetType, ViewPlugin, EditorView } from "@codemirror/view"
 
 const SOURCE_CODE_EDITOR_CONTENT = './source-code-editor.js'
 
@@ -43,13 +43,10 @@ class UUIDWidget extends WidgetType {
     //  TODO: use spinner instead of basic loading text
     wrap.appendChild(document.createTextNode('Loading Content Name...'))
     makeDraggable(wrap, this.id, this.config)
-    Core
-      .send({ type: 'metadata', id: this.id})
-      .then(({ error, metadata }) => {
-        wrap.innerHTML = ''
-        const text = error ? this.id : metadata.name
-        wrap.appendChild(document.createTextNode(text))
-      })
+    // TODO: actually fetch name
+    wrap.innerHTML = ''
+    wrap.appendChild(document.createTextNode(this.id))
+
     return wrap
   }
 

@@ -28,7 +28,7 @@
 </template>
 
 <script>
-  import JSZip from 'npm/unscoped/jszip/3.10.1'
+  import JSZip from 'jszip'
   import FolderTree from './folder-tree.vue'
   import recursivelyLoad from '../../utils/recursively-load.js'
 

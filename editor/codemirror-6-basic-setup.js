@@ -1,5 +1,5 @@
 //  TODO: be able to specify these two importantly peer imports from the code level here
-import { EditorState } from 'npm/codemirror/state/6.2.0'
+import { EditorState } from '@codemirror/state'
 import {
   keymap,
   highlightSpecialChars,
@@ -10,7 +10,7 @@ import {
   crosshairCursor,
   lineNumbers,
   highlightActiveLineGutter
-} from "npm/codemirror/view/6.9.2"
+} from "@codemirror/view"
 import {
   defaultHighlightStyle,
   syntaxHighlighting,
@@ -18,20 +18,20 @@ import {
   bracketMatching,
   foldGutter,
   foldKeymap
-} from "npm/codemirror/language/6.6.0"
+} from "@codemirror/language"
 import {
   defaultKeymap,
   history,
   historyKeymap
-} from 'npm/codemirror/commands/6.2.2'
-import { searchKeymap, highlightSelectionMatches } from "npm/codemirror/search/6.2.3"
+} from '@codemirror/commands'
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search"
 import {
   autocompletion,
   completionKeymap,
   closeBrackets,
   closeBracketsKeymap
-} from "npm/codemirror/autocomplete/6.4.2"
-import { lintKeymap } from "npm/codemirror/lint/6.2.0"
+} from "@codemirror/autocomplete"
+import { lintKeymap } from "@codemirror/lint"
 
 export default (() => [
   lineNumbers(),

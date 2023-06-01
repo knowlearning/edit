@@ -1,18 +1,16 @@
 //  TODO: be able to specify these two importantly peer imports from the code level here
-import { EditorState, EditorSelection, Compartment } from 'npm/codemirror/state/6.2.0'
-import { keymap, EditorView } from "npm/codemirror/view/6.9.2"
-import { v1 as uuid } from 'npm/unscoped/uuid/8.3.2'
-import { javascript, esLint } from 'npm/codemirror/lang-javascript/6.1.4'
-import { lintGutter, linter } from "npm/codemirror/lint/6.2.0"
-import * as eslint from "npm/unscoped/eslint-linter-browserify/8.35.0";
+import { EditorState, EditorSelection, Compartment } from '@codemirror/state'
+import { keymap, EditorView } from "@codemirror/view"
+import { v1 as uuid, validate } from 'uuid'
+import { javascript, esLint } from '@codemirror/lang-javascript'
+import { lintGutter, linter } from "@codemirror/lint"
+import * as eslint from "eslint-linter-browserify"
 import esLintRecommendedRules from './eslint-recommended-rules.js'
-import { vue } from 'npm/codemirror/lang-vue/0.1.1'
-import { indentWithTab } from 'npm/codemirror/commands/6.2.2'
+import { vue } from '@codemirror/lang-vue'
+import { indentWithTab } from '@codemirror/commands'
 import basicSetup from './codemirror-6-basic-setup.js'
 import ContentReferencePlugin from './codemirror-6-content-reference-plugin.js'
-import codemirrorReducer from '../../utils/codemirror-reducer.js'
-
-const { upload, download } = Core
+import codemirrorReducer from './codemirror-reducer.js'
 
 const style = document.createElement('style')
 style.appendChild(document.createTextNode(`
@@ -24,22 +22,18 @@ style.appendChild(document.createTextNode(`
 `))
 document.head.appendChild(style)
 
-const container = document.createElement('div')
-container.style.width = '100%'
-container.style.height = '100%'
-container.style.position = 'absolute'
+export default async function setupEditor(base) {
 
-let editor = null
-let state = null
+  const container = document.createElement('div')
+  container.style.width = '100%'
+  container.style.height = '100%'
+  container.style.position = 'absolute'
 
-export default async function setupEditor(passedState, interact) {
-  let awaitingPatchApply = false
+  const state = await Agent.mutate(base)
 
-  state = passedState || {
-    base: './source-code-editor.js',
-    changes: [],
-    reducer: null
-  }
+  if (state.base !== base) state.base = base
+  if (!state.changes) state.changes = []
+  state.reducer = null // TODO: more consideration around reducers
 
   const keymaps = [
     indentWithTab,
@@ -60,11 +54,8 @@ export default async function setupEditor(passedState, interact) {
             )
           }
         }), {userEvent: "input.indent"}))
-        Core
-          .send({ type: 'metadata', id: state.base })
-          .then(({ metadata }) => {
-            upload({ ...metadata, name: 'New Content', id }, '')
-          })
+        //  TODO: collect type info from user, or default to current type
+        Agent.upload('New Content', 'text/plain', '', id)
         
         return true
       }
@@ -73,20 +64,17 @@ export default async function setupEditor(passedState, interact) {
       key: 'Ctrl-s',
       preventDefault: true,
       run() {
-        awaitingPatchApply = true
-        editor.contentDOM.blur()
-        Core.send({ type: 'save' })
+        //  TODO: handle save behavior
       }
     }
   ]
 
+  //  TODO: apply these swaps more directly here
+  /*
   Core.send({ type: 'state', scope: 'log' }, ({ state: event, interaction }) => {
     const { root, base } = state
     if (event && event.type === 'patch-apply' && event.swaps[root] && event.swaps[base]) {
-      if (awaitingPatchApply) {
-        awaitingPatchApply = false
-        editor.contentDOM.focus()
-      }
+
       const text = editorState.doc.toString()
       const changes = []
       //  apply swaps
@@ -107,16 +95,15 @@ export default async function setupEditor(passedState, interact) {
       interact(state)
     }
   })
+  */
 
   //  download document and apply any previously captured changes
-  const [doc, type] = await Promise.all([
-    download(state.base)
+  const doc = await (
+    Agent
+      .download(state.base)
       .then(data => data.text())
-      .then(text => codemirrorReducer(text, state.changes)),
-    Core
-      .send({ type: 'metadata', id: state.base })
-      .then(({ metadata: { type } }) => type )
-  ])
+      .then(text => codemirrorReducer(text, state.changes))
+  )
 
   const esLintConfig = {
     globals: {
@@ -148,23 +135,23 @@ export default async function setupEditor(passedState, interact) {
     ContentReferencePlugin(state)
   ]
 
+  //  TODO: handle types
   //  TODO: better recognizers...
+  /*
   const languageModules = {
     'application/javascript': javascript,
     'application/javascript;syntax=vue-template': vue
   }
-
   if (languageModules[type]) extensions.push(languageModules[type]())
+  */
 
   const editorState = EditorState.create({ doc, extensions })
-
   const dispatch = transaction => {
     editor.update([transaction])
     state.changes.push(transaction.changes.toJSON())
-    interact(state)
   }
 
-  editor = new EditorView({
+  const editor = new EditorView({
     state: editorState,
     parent: container,
     dispatch
