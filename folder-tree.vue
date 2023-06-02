@@ -50,9 +50,6 @@
         children: []
       }
     },
-    created() {
-      this.name = this.id //  TODO Actually get the name
-    },
     computed: {
       id() {
         return this.path.split('/').pop()
@@ -69,6 +66,7 @@
     },
     created() {
       const { id } = this
+      this.name = id //  TODO Actually get the name
       Agent
         .download(id)
         .then(res => res.text())
