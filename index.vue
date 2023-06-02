@@ -8,8 +8,9 @@
   <splitpanes
     v-else
     class="default-theme"
+    @resize="adjustPanelSizes"
   >
-    <pane>
+    <pane :size="panels[0].size">
       <button @click="logOut">log out</button>
       <FolderTree
         :path="root"
@@ -17,7 +18,7 @@
         @toggle="togglePath"
       />
     </pane>
-    <pane>
+    <pane :size="panels[1].size">
       <Editor :id="root" />
     </pane>
   </splitpanes>
@@ -41,7 +42,8 @@
       return {
         auth: null,
         root: 'a0d171b0-c782-11ed-8e12-e15b5a9c6f12',
-        paths: {}
+        paths: {},
+        panels: [{ size: 20  }, { size: 80 }]
       }
     },
     async created() {
@@ -58,6 +60,11 @@
         if (this.paths[path]) delete this.paths[path]
         else this.paths[path] = true
       },
+      adjustPanelSizes(panels) {
+        this
+          .panels
+          .forEach((p, i) => p.size = panels[i].size)
+      }
     }
   }
 </script>
