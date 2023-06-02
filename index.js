@@ -1,13 +1,16 @@
-import { browserAgent } from '@knowlearning/agents'
-import sourceCodeEditor from './editor/source-code-editor.js'
-import './index.css'
+import { createApp } from 'vue'
+import { createStore } from 'vuex'
+import { browserAgent, vuePersistentStore } from '@knowlearning/agents'
+import mainComponent from './index.vue'
+import storeConfig from './store.js'
 
 window.Agent = browserAgent()
 
 async function init() {
-  const base = 'a0d171b0-c782-11ed-8e12-e15b5a9c6f12'
-  const container = await sourceCodeEditor(base)
-  document.body.appendChild(container)
+  const store = createStore(await vuePersistentStore(storeConfig))
+  const app = createApp(mainComponent)
+  app.use(store)
+  app.mount(document.body)
 }
 
 init()

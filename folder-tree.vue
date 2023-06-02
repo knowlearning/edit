@@ -46,9 +46,12 @@
     },
     data() {
       return {
-        name: 'loading',
+        name: 'loading...',
         children: []
       }
+    },
+    created() {
+      this.name = this.id //  TODO Actually get the name
     },
     computed: {
       id() {
@@ -66,10 +69,7 @@
     },
     created() {
       const { id } = this
-      Core
-        .send({ type: 'metadata', id })
-        .then(({ metadata: { name } }) => this.name = name)
-      Core
+      Agent
         .download(id)
         .then(res => res.text())
         .then(text => this.children = [...new Set(getUUIDs(text))])
