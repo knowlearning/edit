@@ -5,18 +5,26 @@
     google
     microsoft
   />
-  <div v-else>
-    <button @click="logOut">log out</button>
-    <FolderTree
-      :path="root"
-      :paths="paths"
-      @toggle="togglePath"
-    />
-    <Editor :id="root" />
-  </div>
+  <splitpanes
+    v-else
+    class="default-theme"
+  >
+    <pane>
+      <button @click="logOut">log out</button>
+      <FolderTree
+        :path="root"
+        :paths="paths"
+        @toggle="togglePath"
+      />
+    </pane>
+    <pane>
+      <Editor :id="root" />
+    </pane>
+  </splitpanes>
 </template>
 
 <script>
+  import { Splitpanes, Pane } from 'splitpanes'
   import LoginMenu from './login-menu.vue'
   import Editor from './editor.vue'
   import FolderTree from './folder-tree.vue'
@@ -25,7 +33,9 @@
     components: {
       LoginMenu,
       FolderTree,
-      Editor
+      Editor,
+      Splitpanes,
+      Pane
     },
     data() {
       return {
@@ -53,8 +63,4 @@
 </script>
 
 <style>
-  body
-  {
-    margin: 0;
-  }
 </style>

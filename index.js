@@ -4,6 +4,9 @@ import { browserAgent, vuePersistentStore } from '@knowlearning/agents'
 import mainComponent from './index.vue'
 import storeConfig from './store.js'
 
+import 'splitpanes/dist/splitpanes.css'
+import './index.css'
+
 window.Agent = browserAgent()
 
 async function init() {
