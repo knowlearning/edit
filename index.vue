@@ -19,7 +19,10 @@
       />
     </pane>
     <pane :size="panels[1].size">
-      <Editor :id="root" />
+      <Editor
+        :id="root"
+        @save="onSave"
+      />
     </pane>
   </splitpanes>
 </template>
@@ -41,7 +44,7 @@
     data() {
       return {
         auth: null,
-        root: 'a0d171b0-c782-11ed-8e12-e15b5a9c6f12',
+        root: '15cbdca0-03e5-11ee-9151-87aafd410b1c',
         paths: {},
         panels: [{ size: 20  }, { size: 80 }]
       }
@@ -64,6 +67,11 @@
         this
           .panels
           .forEach((p, i) => p.size = panels[i].size)
+      },
+      async onSave(id) { // TODO: get root and all scopes under root that are saved to pass to patch
+        console.log('PATCHING!!!!', id)
+        const patchResponse = await Agent.patch(id, [id])
+        console.log('PATCH RESPONSE', patchResponse)
       }
     }
   }

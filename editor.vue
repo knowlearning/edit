@@ -9,8 +9,11 @@
     props: {
       id: String
     },
+    emits: ['save'],
     async created() {
-      const container = await sourceCodeEditor(this.id)
+      const container = await sourceCodeEditor(this.id, () => {
+        this.$emit('save', this.id)
+      })
       this.$refs.container.appendChild(container)
     }
   }

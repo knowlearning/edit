@@ -22,7 +22,7 @@ style.appendChild(document.createTextNode(`
 `))
 document.head.appendChild(style)
 
-export default async function setupEditor(base) {
+export default async function setupEditor(base, onSave) {
 
   const container = document.createElement('div')
   container.style.width = '100%'
@@ -63,8 +63,8 @@ export default async function setupEditor(base) {
     {
       key: 'Ctrl-s',
       preventDefault: true,
-      run() {
-        //  TODO: handle save behavior
+      async run() {
+        onSave()
       }
     }
   ]
