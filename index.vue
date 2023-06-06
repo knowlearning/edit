@@ -93,7 +93,7 @@
         console.log('saving!!!')
         const { swaps } = await Agent.patch(this.selectedRoot, [this.selectedBase])
         //  swap all roots and paths for folder tree
-        this.roots = this.roots.map(root => swaps[root] || root)
+        this.roots = this.roots.map(root => this.selectedRoot === root ? swaps[root] : root)
         this.selectedPath = applySwaps(this.selectedPath, swaps)
         Object
           .keys(this.paths)

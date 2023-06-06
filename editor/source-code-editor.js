@@ -66,17 +66,8 @@ export default async function setupEditor(scope, root, base, save) {
       preventDefault: true,
       async run() {
         const swaps = await save()
+        console.log('saved...', swaps)
         if (swaps[state.base]) {
-          //  apply swaps to root, base and scope
-          Object
-            .entries(swaps)
-            .forEach(([from, to]) => scope = scope.replaceAll(from, to))
-          const oldState = state
-          state = await Agent.mutate(scope)
-          state.root = swaps[oldState.root]
-          state.base = swaps[oldState.base]
-          state.changes = []
-
           //  apply swaps to document
           const text = editorState.doc.toString()
           const changes = []
@@ -91,6 +82,20 @@ export default async function setupEditor(scope, root, base, save) {
               }
             })
           editor.dispatch({changes})
+
+          //  apply swaps to root, base and scope
+          Object
+            .entries(swaps)
+            .forEach(([from, to]) => scope = scope.replaceAll(from, to))
+          const oldState = state
+          state = await Agent.mutate(scope)
+          state.root = swaps[oldState.root]
+          state.base = swaps[oldState.base]
+          state.changes = []
+          state.reducer = null
+          console.log('staaaaate', state)
+
+          return true
         }
       }
     }
