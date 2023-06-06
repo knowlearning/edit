@@ -1,20 +1,18 @@
 <template>
   <div v-if="recursive">🐢</div>
   <div v-else class="parent">
-    <div @click="$emit('toggle', path)">
+    <div>
       <span
         draggable="true"
         @dragstart="initiateViewDrag"
+        @click.stop="$emit('select', path)"
       >
-        {{ name }}
+        {{ name || '----' }}
       </span>
       <span
-        draggable="true"
-        @dragstart="initiateEditDrag"
+        v-if="children.length"
+        @click="$emit('toggle', path)"
       >
-        edit
-      </span>
-      <span v-if="children.length">
         {{ open ? ' v ' : ' > ' }}
       </span>
     </div>
@@ -29,6 +27,7 @@
         :path="`${path}/${id}`"
         :paths="paths"
         @toggle="$emit('toggle', $event)"
+        @select="$emit('select', $event)"
       />
     </div>
   </div>

@@ -12,17 +12,24 @@
   >
     <pane :size="panels[0].size">
       <button @click="logOut">log out</button>
+      <button @click="create">create</button>
       <FolderTree
+        v-for="root in roots"
+        :key="root"
         :path="root"
         :paths="paths"
+        @select="select"
         @toggle="togglePath"
       />
     </pane>
     <pane :size="panels[1].size">
       <Editor
-        :id="root"
+        v-if="selected"
+        :key="selected"
+        :id="selected"
         @save="onSave"
       />
+      <div v-else>Select a file to edit</div>
     </pane>
   </splitpanes>
 </template>
@@ -44,7 +51,8 @@
     data() {
       return {
         auth: null,
-        root: 'a0d171b0-c782-11ed-8e12-e15b5a9c6f12',
+        roots: [],
+        selected: null,
         paths: {},
         panels: [{ size: 20  }, { size: 80 }]
       }
@@ -68,10 +76,17 @@
           .panels
           .forEach((p, i) => p.size = panels[i].size)
       },
+      async create() {
+        const id = await Agent.upload('New Content', 'text/plain', 'new file')
+        this.roots.push(id)
+      },
       async onSave(id) { // TODO: get root and all scopes under root that are saved to pass to patch
         console.log('PATCHING!!!!', id)
         const patchResponse = await Agent.patch(id, [id])
         console.log('PATCH RESPONSE', patchResponse)
+      },
+      select(path) {
+        this.selected = path.split('/').at(-1)
       }
     }
   }
