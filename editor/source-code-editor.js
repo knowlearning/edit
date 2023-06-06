@@ -22,15 +22,16 @@ style.appendChild(document.createTextNode(`
 `))
 document.head.appendChild(style)
 
-export default async function setupEditor(base, onSave) {
+export default async function setupEditor(scope, root, base, save) {
 
   const container = document.createElement('div')
   container.style.width = '100%'
   container.style.height = '100%'
   container.style.position = 'absolute'
 
-  const state = await Agent.mutate(base)
+  let state = await Agent.mutate(scope)
 
+  if (state.root !== root) state.root = root
   if (state.base !== base) state.base = base
   if (!state.changes) state.changes = []
   state.reducer = null // TODO: more consideration around reducers
@@ -64,38 +65,36 @@ export default async function setupEditor(base, onSave) {
       key: 'Ctrl-s',
       preventDefault: true,
       async run() {
-        onSave()
+        const swaps = await save()
+        if (swaps[state.base]) {
+          //  apply swaps to root, base and scope
+          Object
+            .entries(swaps)
+            .forEach(([from, to]) => scope = scope.replaceAll(from, to))
+          const oldState = state
+          state = await Agent.mutate(scope)
+          state.root = swaps[oldState.root]
+          state.base = swaps[oldState.base]
+          state.changes = []
+
+          //  apply swaps to document
+          const text = editorState.doc.toString()
+          const changes = []
+          Object
+            .entries(swaps)
+            .forEach(([ from, to ]) => {
+              const getNext = skip => text.indexOf(from, skip)
+              let next = getNext()
+              while (next > -1) {
+                changes.push({from: next, to: next + from.length, insert: to})
+                next = getNext(next + to.length)
+              }
+            })
+          editor.dispatch({changes})
+        }
       }
     }
   ]
-
-  //  TODO: apply these swaps more directly here
-  /*
-  Core.send({ type: 'state', scope: 'log' }, ({ state: event, interaction }) => {
-    const { root, base } = state
-    if (event && event.type === 'patch-apply' && event.swaps[root] && event.swaps[base]) {
-
-      const text = editorState.doc.toString()
-      const changes = []
-      //  apply swaps
-      Object
-        .entries(event.swaps)
-        .forEach(([ from, to ]) => {
-          const getNext = skip => text.indexOf(from, skip)
-          let next = getNext()
-          while (next > -1) {
-            changes.push({from: next, to: next + from.length, insert: to})
-            next = getNext(next + to.length)
-          }
-        })
-      editor.dispatch({changes})
-      state.root = event.swaps[root]
-      state.base = event.swaps[base]
-      state.changes = []
-      interact(state)
-    }
-  })
-  */
 
   //  download document and apply any previously captured changes
   const doc = await (

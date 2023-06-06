@@ -7,13 +7,13 @@
 
   export default {
     props: {
-      id: String
+      scope: String,
+      root: String,
+      base: String,
+      save: Function
     },
-    emits: ['save'],
     async created() {
-      const container = await sourceCodeEditor(this.id, () => {
-        this.$emit('save', this.id)
-      })
+      const container = await sourceCodeEditor(this.scope, this.root, this.base, this.save)
       this.$refs.container.appendChild(container)
     }
   }
