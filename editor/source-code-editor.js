@@ -29,6 +29,8 @@ export default async function setupEditor(scope, root, base, save) {
   container.style.height = '100%'
   container.style.position = 'absolute'
 
+  const editable = new Compartment()
+
   let state = await Agent.mutate(scope)
 
   if (state.root !== root) state.root = root
@@ -68,6 +70,7 @@ export default async function setupEditor(scope, root, base, save) {
         const swaps = await save()
         console.log('saved...', swaps)
         if (swaps[state.base]) {
+          setEditable(false)
           //  apply swaps to document
           const text = editorState.doc.toString()
           const changes = []
@@ -94,7 +97,7 @@ export default async function setupEditor(scope, root, base, save) {
           state.changes = []
           state.reducer = null
           console.log('staaaaate', state)
-
+          setEditable(true)
           return true
         }
       }
@@ -158,8 +161,17 @@ export default async function setupEditor(scope, root, base, save) {
   const editor = new EditorView({
     state: editorState,
     parent: container,
+    extensions: [
+      editable.of(EditorView.editable.of(true))
+    ],
     dispatch
   })
+
+  function setEditable(isEditable=false) {
+    editor.dispatch({
+      effects: editable.reconfigure(EditorView.editable.of(isEditable))
+    });
+  }
 
   return container
 }
