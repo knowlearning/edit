@@ -1,30 +1,19 @@
-import { v1 as uuid } from "uuid"
 import { Decoration, WidgetType, ViewPlugin, EditorView } from "@codemirror/view"
 
-const SOURCE_CODE_EDITOR_CONTENT = './source-code-editor.js'
-
-function makeDraggable(el, id, config) {
+function makeDraggable(el, id) {
   el.setAttribute('draggable', 'true')
   el.setAttribute('aria-hidden', "true")
   el.addEventListener('mousedown', e => e.stopPropagation())
   el.addEventListener('dragstart', e => {
-    const { root } = config
     e.stopPropagation()
-    const json = JSON.stringify({
-      root,
-      id: SOURCE_CODE_EDITOR_CONTENT,
-      scope: uuid(),
-      state: { root, base: id, changes: [], reducer: null }
-    })
-    e.dataTransfer.setData('text', json)
+    e.dataTransfer.setData('text', id)
   });
 }
 
 class UUIDWidget extends WidgetType {
-  constructor(id, config) {
+  constructor(id) {
     super()
     this.id = id
-    this.config = config
   }
 
   eq(other) { return other.id == this.id }
@@ -42,10 +31,15 @@ class UUIDWidget extends WidgetType {
     `
     //  TODO: use spinner instead of basic loading text
     wrap.appendChild(document.createTextNode('Loading Content Name...'))
-    makeDraggable(wrap, this.id, this.config)
+    makeDraggable(wrap, this.id)
     // TODO: actually fetch name
-    wrap.innerHTML = ''
-    wrap.appendChild(document.createTextNode(this.id))
+    wrap.innerHTML = '...'
+    Agent
+      .metadata(this.id)
+      .then(({ name }) => {
+        wrap.innerHTML = ''
+        wrap.appendChild(document.createTextNode(name))
+      })
 
     return wrap
   }
