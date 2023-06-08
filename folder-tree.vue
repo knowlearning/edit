@@ -31,7 +31,6 @@
 </template>
 
 <script>
-  import { v1 as uuid } from 'uuid'
   const getUUIDs = s => s.match(/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/g) || []
 
   export default {
@@ -70,22 +69,6 @@
         .download(id)
         .then(res => res.text())
         .then(text => this.children = [...new Set(getUUIDs(text))])
-    },
-    methods: {
-      initiateViewDrag(event) {
-        console.log('Initiating drag!!!!!!!!!!')
-        event.dataTransfer.setData('text', this.id)
-      },
-      initiateEditDrag(event) {
-        const { id: base, root } = this
-        const json = JSON.stringify({
-          root,
-          id: './source-code-editor.js',
-          scope: uuid(),
-          state: { root, base, changes: [], reducer: null }
-        })
-        event.dataTransfer.setData('text', json)
-      }
     }
   }
 

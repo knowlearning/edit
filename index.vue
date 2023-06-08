@@ -21,11 +21,7 @@
         @toggle="togglePath"
       >
         <template v-slot:name="{ id, path }">
-          <div
-            draggable="true"
-            @dragstart="initiateViewDrag"
-            @click.stop="select(path)"
-          >
+          <div @click.stop="select(path)">
             <NameTag :id="id" />
           </div>
         </template>
