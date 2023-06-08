@@ -9,21 +9,9 @@
       >
         {{ open ? ' v ' : ' > ' }}
       </div>
-      <div
-        draggable="true"
-        @dragstart="initiateViewDrag"
-        @click.stop="$emit('select', path)"
-      >
-        {{ name || '----' }}
-      </div>
+      <slot name="name" :id="id" :path="path" />
       <div class="line-spacer"></div>
-      <div
-        v-if="pathSegments.length === 1"
-        class="action-handle"
-        @click.stop="$emit('remove')"
-      >
-        &#10005;
-      </div>
+      <slot name="actions" :id="id" :path="path" />
     </div>
     <div
       v-if="open"

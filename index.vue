@@ -18,10 +18,26 @@
         :key="root"
         :path="root"
         :paths="paths"
-        @select="select"
-        @remove="removeRoot(index)"
         @toggle="togglePath"
-      />
+      >
+        <template v-slot:name="{ id, path }">
+          <div
+            draggable="true"
+            @dragstart="initiateViewDrag"
+            @click.stop="select(path)"
+          >
+            <NameTag :id="id" />
+          </div>
+        </template>
+        <template v-slot:actions="{ path }">
+          <div
+            v-if="path.split('/').length === 1"
+            @click="removeRoot(index)"
+          >
+            &#10005;
+          </div>
+        </template>
+      </FolderTree>
     </pane>
     <pane :size="panels[1].size">
       <Editor
@@ -42,6 +58,7 @@
   import LoginMenu from './login-menu.vue'
   import Editor from './editor.vue'
   import FolderTree from './folder-tree.vue'
+  import NameTag from './name-tag.vue'
 
   function applySwaps(start, swaps) {
     return (
@@ -57,7 +74,8 @@
       FolderTree,
       Editor,
       Splitpanes,
-      Pane
+      Pane,
+      NameTag
     },
     data() {
       return {
@@ -119,6 +137,7 @@
         return swaps
       },
       select(path) {
+        console.log('SELECTING!!!!', path, this.selectedPath)
         if (path !== this.selectedPath) {
           this.originalPath = path
           this.selectedPath = path
