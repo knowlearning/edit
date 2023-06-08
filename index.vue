@@ -113,6 +113,7 @@
       async create() {
         const id = await Agent.upload('New Content', 'text/plain', 'new file')
         this.roots.push(id)
+        this.originalPath = id
         this.selectedPath = id
       },
       async save() {
@@ -133,7 +134,6 @@
         return swaps
       },
       select(path) {
-        console.log('SELECTING!!!!', path, this.selectedPath)
         if (path !== this.selectedPath) {
           this.originalPath = path
           this.selectedPath = path
