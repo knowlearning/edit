@@ -26,7 +26,7 @@
     <pane :size="panels[1].size">
       <Editor
         v-if="selectedPath"
-        :key="selectedPath"
+        :key="originalPath"
         :scope="selectedPath"
         :root="selectedRoot"
         :base="selectedBase"
@@ -63,6 +63,7 @@
       return {
         auth: null,
         roots: [],
+        originalPath: null,
         selectedPath: null,
         paths: {},
         panels: [{ size: 20  }, { size: 80 }]
@@ -90,7 +91,10 @@
       removeRoot(index) {
         const root = this.roots[index]
         this.roots.splice(index, 1)
-        if (this.selectedRoot === root) this.selectedPath = null
+        if (this.selectedRoot === root) {
+          this.originalPath = null
+          this.selectedPath = null
+        }
       },
       async create() {
         const id = await Agent.upload('New Content', 'text/plain', 'new file')
@@ -115,7 +119,10 @@
         return swaps
       },
       select(path) {
-        this.selectedPath = path
+        if (path !== this.selectedPath) {
+          this.originalPath = path
+          this.selectedPath = path
+        }
       }
     },
     computed: {
