@@ -1,20 +1,28 @@
 <template>
   <div v-if="recursive">🐢</div>
   <div v-else class="parent">
-    <div>
-      <span
+    <div class="line">
+      <div
+        v-if="children.length"
+        @click="$emit('toggle', path)"
+      >
+        {{ open ? ' v ' : ' > ' }}
+      </div>
+      <div
         draggable="true"
         @dragstart="initiateViewDrag"
         @click.stop="$emit('select', path)"
       >
         {{ name || '----' }}
-      </span>
-      <span
-        v-if="children.length"
-        @click="$emit('toggle', path)"
+      </div>
+      <div class="line-spacer"></div>
+      <div
+        v-if="pathSegments.length === 1"
+        class="action-handle"
+        @click.stop="$emit('remove')"
       >
-        {{ open ? ' v ' : ' > ' }}
-      </span>
+        &#10005;
+      </div>
     </div>
     <div
       v-if="open"
@@ -50,14 +58,17 @@
       }
     },
     computed: {
+      pathSegments() {
+        return this.path.split('/')
+      },
       id() {
-        return this.path.split('/').pop()
+        return this.pathSegments.at(-1)
       },
       root() {
-        return this.path.split('/').shift()
+        return this.pathSegments[0]
       },
       recursive() {
-        return this.path.split('/').slice(0, -1).includes(this.id)
+        return this.pathSegments.slice(0, -1).includes(this.id)
       },
       open() {
         return this.paths[this.path]
@@ -96,6 +107,22 @@
   .child
   {
     padding-left: 2em;
+  }
+
+  .line
+  {
+    display: flex;
+  }
+
+  .line-spacer
+  {
+    flex-grow: 1;
+  }
+
+  .action-handle
+  {
+    cursor: pointer;
+    padding: 0 4px;
   }
 
 </style>

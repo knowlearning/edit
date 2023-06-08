@@ -14,17 +14,19 @@
       <button @click="logOut">log out</button>
       <button @click="create">create</button>
       <FolderTree
-        v-for="root in roots"
+        v-for="root, index in roots"
         :key="root"
         :path="root"
         :paths="paths"
         @select="select"
+        @remove="removeRoot(index)"
         @toggle="togglePath"
       />
     </pane>
     <pane :size="panels[1].size">
       <Editor
         v-if="selectedPath"
+        :key="selectedPath"
         :scope="selectedPath"
         :root="selectedRoot"
         :base="selectedBase"
@@ -85,9 +87,15 @@
           .panels
           .forEach((p, i) => p.size = panels[i].size)
       },
+      removeRoot(index) {
+        const root = this.roots[index]
+        this.roots.splice(index, 1)
+        if (this.selectedRoot === root) this.selectedPath = null
+      },
       async create() {
         const id = await Agent.upload('New Content', 'text/plain', 'new file')
         this.roots.push(id)
+        this.selectedPath = id
       },
       async save() {
         console.log('saving!!!')
