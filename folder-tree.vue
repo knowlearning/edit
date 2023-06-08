@@ -4,6 +4,7 @@
     <div class="line">
       <div
         v-if="children.length"
+        class="action-handle"
         @click="$emit('toggle', path)"
       >
         {{ open ? ' v ' : ' > ' }}
