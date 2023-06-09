@@ -8,6 +8,7 @@
       :style="{
         paddingLeft: `${depth * 16}px`
       }"
+      @click="$emit('select', path)"
     >
       <div
         v-if="recursive"

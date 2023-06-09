@@ -18,10 +18,11 @@
         :highlights="highlights"
         :path="root"
         :paths="paths"
+        @select="selectPath"
         @toggle="togglePath"
       >
         <template v-slot:name="{ id, path }">
-          <div @click.stop="select(path)">
+          <div>
             <NameTag :id="id" />
           </div>
         </template>
@@ -158,7 +159,7 @@
           })
         return swaps
       },
-      select(path) {
+      selectPath(path) {
         if (path !== this.selectedPath) {
           this.originalPath = path
           this.selectedPath = path
