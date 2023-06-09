@@ -30,10 +30,8 @@ class UUIDWidget extends WidgetType {
       rgb(255 255 255 / 10%) 0px 0px 0px 1px inset
     `
     //  TODO: use spinner instead of basic loading text
-    wrap.appendChild(document.createTextNode('Loading Content Name...'))
+    wrap.appendChild(document.createTextNode('...'))
     makeDraggable(wrap, this.id)
-    // TODO: actually fetch name
-    wrap.innerHTML = '...'
     Agent
       .metadata(this.id)
       .then(({ name }) => {

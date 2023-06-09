@@ -16,6 +16,7 @@
       <FolderTree
         v-for="root, index in roots"
         :key="root"
+        :highlights="highlights"
         :path="root"
         :paths="paths"
         @toggle="togglePath"
@@ -146,6 +147,9 @@
       },
       selectedBase() {
         return this.selectedPath.split('/').at(-1)
+      },
+      highlights() {
+        return { [this.selectedPath]: true }
       }
     }
   }

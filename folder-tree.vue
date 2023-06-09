@@ -1,9 +1,17 @@
 <template>
-  <div v-if="recursive">🐢</div>
-  <div v-else class="parent">
-    <div class="line">
+  <div class="parent">
+    <div
+      :class="{
+        line: true,
+        highlighted: !!highlights[this.path]
+      }"
+      :style="{
+        paddingLeft: `${depth * 8}px`
+      }"
+    >
+      <div v-if="recursive">🐢</div>
       <div
-        v-if="children.length"
+        v-else-if="children.length"
         class="action-handle"
         @click="$emit('toggle', path)"
       >
@@ -13,19 +21,24 @@
       <div class="line-spacer"></div>
       <slot name="actions" :id="id" :path="path" />
     </div>
-    <div
-      v-if="open"
-      class="child"
-    >
+    <div v-if="open">
       <folder-tree
         v-for="id in children"
         :key="id"
         :id="id"
         :path="`${path}/${id}`"
         :paths="paths"
+        :highlights="highlights"
         @toggle="$emit('toggle', $event)"
         @select="$emit('select', $event)"
-      />
+      >
+        <template v-slot:name="{ id, path }">
+          <slot name="name" :id="id" :path="path" />
+        </template>
+        <template v-slot:actions="{ id, path }">
+          <slot name="actions" :id="id" :path="path" />
+        </template>
+      </folder-tree>
     </div>
   </div>
 </template>
@@ -37,7 +50,8 @@
     name: 'folder-tree',
     props: {
       path: String,
-      paths: Object
+      paths: Object,
+      highlights: Object
     },
     data() {
       return {
@@ -48,6 +62,9 @@
     computed: {
       pathSegments() {
         return this.path.split('/')
+      },
+      depth() {
+        return this.pathSegments.length
       },
       id() {
         return this.pathSegments.at(-1)
@@ -95,6 +112,11 @@
   {
     cursor: pointer;
     padding: 0 4px;
+  }
+
+  .highlighted
+  {
+    background: orange
   }
 
 </style>
