@@ -6,16 +6,27 @@
         highlighted: !!highlights[this.path]
       }"
       :style="{
-        paddingLeft: `${depth * 8}px`
+        paddingLeft: `${depth * 16}px`
       }"
     >
-      <div v-if="recursive">🐢</div>
+      <div
+        v-if="recursive"
+        class="action-handle"
+      >
+        🐢
+      </div>
       <div
         v-else-if="children.length"
         class="action-handle"
         @click="$emit('toggle', path)"
       >
-        {{ open ? ' v ' : ' > ' }}
+        {{ open ? '▼' : '►' }}
+      </div>
+      <div
+        v-else
+        class="action-handle"
+      >
+        -
       </div>
       <slot name="name" :id="id" :path="path" />
       <div class="line-spacer"></div>
@@ -64,7 +75,7 @@
         return this.path.split('/')
       },
       depth() {
-        return this.pathSegments.length
+        return this.pathSegments.length - 1
       },
       id() {
         return this.pathSegments.at(-1)
@@ -110,8 +121,11 @@
 
   .action-handle
   {
+    display: inline-block;
+    width: 32px;
+    text-align: center;
     cursor: pointer;
-    padding: 0 4px;
+    user-select: none;
   }
 
   .highlighted
