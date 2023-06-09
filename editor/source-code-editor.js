@@ -67,42 +67,52 @@ export default async function setupEditor(scope, root, base, save) {
       key: 'Ctrl-s',
       preventDefault: true,
       async run() {
-        const swaps = await save()
-        console.log('saved...', swaps)
-        if (swaps[state.base]) {
-          setEditable(false)
-          //  apply swaps to document
-          const text = editorState.doc.toString()
-          const changes = []
-          Object
-            .entries(swaps)
-            .forEach(([ from, to ]) => {
-              const getNext = skip => text.indexOf(from, skip)
-              let next = getNext()
-              while (next > -1) {
-                changes.push({from: next, to: next + from.length, insert: to})
-                next = getNext(next + to.length)
-              }
+        return (
+          save()
+            .then(swaps => {
+              console.log('saved...', swaps)
+              return applySwaps(swaps)
             })
-          editor.dispatch({changes})
-
-          //  apply swaps to root, base and scope
-          Object
-            .entries(swaps)
-            .forEach(([from, to]) => scope = scope.replaceAll(from, to))
-          const oldState = state
-          state = await Agent.mutate(scope)
-          state.root = swaps[oldState.root]
-          state.base = swaps[oldState.base]
-          state.changes = []
-          state.reducer = null
-          console.log('staaaaate', state)
-          setEditable(true)
-          return true
-        }
+            .catch(error => {
+              alert(error)
+            })
+        )
       }
     }
   ]
+
+  async function applySwaps(swaps) {
+    if (swaps[state.base]) {
+      setEditable(false)
+      //  apply swaps to document
+      const text = editorState.doc.toString()
+      const changes = []
+      Object
+        .entries(swaps)
+        .forEach(([ from, to ]) => {
+          const getNext = skip => text.indexOf(from, skip)
+          let next = getNext()
+          while (next > -1) {
+            changes.push({from: next, to: next + from.length, insert: to})
+            next = getNext(next + to.length)
+          }
+        })
+      editor.dispatch({changes})
+
+      //  apply swaps to root, base and scope
+      Object
+        .entries(swaps)
+        .forEach(([from, to]) => scope = scope.replaceAll(from, to))
+      const oldState = state
+      state = await Agent.mutate(scope)
+      state.root = swaps[oldState.root]
+      state.base = swaps[oldState.base]
+      state.changes = []
+      state.reducer = null
+      setEditable(true)
+      return true
+    }
+  }
 
   //  download document and apply any previously captured changes
   const doc = await (
