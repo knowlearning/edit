@@ -149,7 +149,8 @@ export default async function setupEditor(scope, root, base, save) {
 //    EditorView.domEventHandlers({
 //      scroll: (event, view) => {}
 //    }),
-    ContentReferencePlugin(state)
+    ContentReferencePlugin(state),
+    editable.of(EditorView.editable.of(true))
   ]
 
   //  TODO: handle types
@@ -171,16 +172,14 @@ export default async function setupEditor(scope, root, base, save) {
   const editor = new EditorView({
     state: editorState,
     parent: container,
-    extensions: [
-      editable.of(EditorView.editable.of(true))
-    ],
     dispatch
   })
 
   function setEditable(isEditable=false) {
     editor.dispatch({
       effects: editable.reconfigure(EditorView.editable.of(isEditable))
-    });
+    })
+    editor.focus()
   }
 
   return container
