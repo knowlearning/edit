@@ -34,7 +34,28 @@
           </div>
         </template>
       </FolderTree>
-      <button @click="create">+</button>
+      <div v-if="creating">
+        <input
+          v-model="creating.name"
+          @keypress.enter="create"
+        >
+        <select v-model="creating.type">
+          <option
+            v-for="t in types"
+            :key="t.value"
+            :value="t.value"
+          >
+            {{ t.display }}
+          </option>
+        </select>
+        <button @click="create">create</button>
+      </div>
+      <button
+        v-else
+        @click="creating = { name: '', type: 'text/plain' }"
+      >
+        +
+      </button>
     </pane>
     <pane :size="panels[1].size">
       <Editor
@@ -77,6 +98,7 @@
     data() {
       return {
         auth: null,
+        creating: null,
         roots: [],
         originalPath: null,
         selectedPath: null,
@@ -112,7 +134,9 @@
         }
       },
       async create() {
-        const id = await Agent.upload('New Content', 'text/plain', 'new file')
+        const { name, type } = this.creating
+        this.creating = null
+        const id = await Agent.upload(name, type, 'new file')
         this.roots.push(id)
         this.originalPath = id
         this.selectedPath = id
@@ -150,10 +174,56 @@
       },
       highlights() {
         return { [this.selectedPath]: true }
+      },
+      types() {
+        return [
+          {
+            display: 'Vue',
+            value: 'application/javascript;syntax=vue-template'
+          },
+          {
+            display: 'JavaScript',
+            value: 'application/javascript'
+          },
+          {
+            display: 'JSON',
+            value: 'application/json'
+          },
+          {
+            display: 'Plaintext',
+            value: 'text/plain'
+          },
+          {
+            display: 'HTML',
+            value: 'application/html'
+          },
+          {
+            display: 'CSS',
+            value: 'text/css'
+          },
+          {
+            display: 'YAML',
+            value: 'text/yaml'
+          },
+          {
+            display: 'Dockerfile',
+            value: 'text/plain;syntax=Dockerfile'
+          }
+        ]
       }
     }
   }
 </script>
+["", "vue"],
+["application/javascript", "js"],
+["application/json", "json"],
+["text/html", "html"],
+["text/css", "css"],
+["text/plain", "txt"],
+["text/yaml", "yaml"],
+["image/png", "png"],
+["text/plain;syntax=Dockerfile", "Dockerfile"]
+
 
 <style>
 </style>
