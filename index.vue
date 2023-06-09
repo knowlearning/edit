@@ -12,7 +12,6 @@
   >
     <pane :size="panels[0].size">
       <button @click="logOut">log out</button>
-      <button @click="create">create</button>
       <FolderTree
         v-for="root, index in roots"
         :key="root"
@@ -35,6 +34,7 @@
           </div>
         </template>
       </FolderTree>
+      <button @click="create">+</button>
     </pane>
     <pane :size="panels[1].size">
       <Editor
