@@ -1,4 +1,4 @@
-  Decide on naming
-  Support saving
-  Decide on multiple roots
+X Decide on naming
+X Support saving
+X Decide on multiple roots
   Use types
