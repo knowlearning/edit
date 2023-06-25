@@ -18,7 +18,7 @@
     "@codemirror/search": "^6.5.0",
     "@codemirror/state": "^6.2.1",
     "@codemirror/view": "^6.13.1",
-    "@knowlearning/agents": "^0.4.3",
+    "@knowlearning/agents": "^0.4.5",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "eslint-linter-browserify": "^8.42.0",
     "splitpanes": "^3.1.5",
